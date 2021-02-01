@@ -1,0 +1,26 @@
+{
+    "agent": "RNNAgent",
+    "model": {
+        "rnn_type": "lstm",
+        "hidden_dim": 256,
+        "encoding_dim": 16,
+        "encoding_type": "learned",
+        "num_layers": 1,
+        "dropout": 0
+    },
+    "dataset": {
+       "folder": "data",
+        "train_split": "correct_dynamics_dataset_train.csv",
+        "valid_split": "correct_dynamics_dataset_test.csv",
+        "include_correctness": true
+    },
+    "dataloader": {
+        "batch_size": 8,
+        "num_workers": 0
+    },
+    "optimizer": {
+        "learning_rate": 3e-4,
+        "weight_decay": 0
+    },
+    "epochs": 300
+}

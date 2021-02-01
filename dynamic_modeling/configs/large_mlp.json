@@ -1,0 +1,23 @@
+{
+    "agent": "MLPAgent",
+    "model": {
+        "hidden_dim": 256,
+        "encoding_dim": 16,
+        "encoding_type": "learned"
+    },
+    "dataset": {
+        "folder": "data",
+        "train_split": "correct_dynamics_dataset_train.csv",
+        "valid_split": "correct_dynamics_dataset_test.csv",
+        "include_correctness": false
+    },
+    "dataloader": {
+        "batch_size": 256,
+        "num_workers": 0
+    },
+    "optimizer": {
+        "learning_rate": 3e-4,
+        "weight_decay": 0
+    },
+    "epochs": 100
+}
