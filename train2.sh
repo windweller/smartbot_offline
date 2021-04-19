@@ -1,0 +1,2 @@
+python smartbot_offline/offline_pg.py --data_split 1 --folder mar25_wis_new_data_seed42_no_val_mask_split1
+python smartbot_offline/offline_pg.py --data_split 2 --folder mar25_wis_new_data_seed42_no_val_mask_split2
