@@ -20,6 +20,11 @@ import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from scipy.stats import norm, t
 
+def normalize(ob):
+    return (ob - [3, 4, 3, 10, 0.5, 0.5, 0.5, 27])/ [1, 4, 3, 10, 0.5, 0.5, 0.5, 18]
+
+def unnormalize(norm_ob):
+    return np.array(norm_ob) * np.array([1, 4, 3, 10, 0.5, 0.5, 0.5, 18]) + np.array([3, 4, 3, 10, 0.5, 0.5, 0.5, 27])
 
 def mlp(sizes, activation=nn.Tanh, output_activation=nn.Identity):
     # Build a feedforward neural network.
@@ -63,6 +68,40 @@ def masked_softmax(vector: torch.Tensor, mask: torch.Tensor, dim: int = -1) -> t
     # return torch.nn.functional.log_softmax(vector, dim=dim)
     return torch.nn.functional.softmax(vector, dim=dim)
 
+norm_names = ['grade_norm', 'pre-score_norm', 'stage_norm', 'failed_attempts_norm',
+         'pos_norm', 'neg_norm', 'hel_norm', 'anxiety_norm']
+
+raw_names = ['grade', 'pre', 'stage', 'failed_attempts', 'pos', 'neg', 'help', 'anxiety']
+
+def generate_features(norm_ob_row, unnormed_ob_row):
+    assert len(unnormed_ob_row.shape) == 1
+
+    norm_obs_dict = dict(zip(norm_names, norm_ob_row))
+    raw_obs_dict = dict(zip(raw_names, unnormed_ob_row))
+
+    features = [norm_obs_dict['stage_norm'],
+                norm_obs_dict['failed_attempts_norm'],
+                norm_obs_dict['pos_norm'],
+                norm_obs_dict['neg_norm'],
+                norm_obs_dict['hel_norm'],
+                norm_obs_dict['anxiety_norm'],
+                norm_obs_dict['grade_norm'],
+                int(raw_obs_dict['pre']),
+                int(raw_obs_dict['anxiety']),
+                int(raw_obs_dict['stage'])]
+
+    return features
+
+# add the feature wrapper around this
+# TODO: 0. DeployPolicy does the following:
+# TODO   - implement all methods that are needed by Sherry
+# TODO   - Take in
+# TODO: 1. re-generate traj of two students
+# TODO: 2. Re-train? BC+Eval (not too hard)
+# TODO: 3. Train on full dataset; or only on split 5
+class DeployPolicy(nn.Module):
+    def __init__(self):
+        super().__init__()
 
 class MLPPolicy(nn.Module):
     def __init__(self, sizes, activation=nn.GELU,
@@ -195,7 +234,6 @@ target_names = ["p_hint", "p_nothing", "p_encourage", "p_question"]
 feature_names = feature_names + categorical_features
 
 MAX_TIME = 28
-
 
 def compute_is_weights_for_nn_policy(behavior_df, eval_policy, eps=0.05, temp=0.1,
                                      reward_column='adjusted_score', no_grad=True,
